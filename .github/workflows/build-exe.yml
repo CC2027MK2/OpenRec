@@ -19,6 +19,9 @@ concurrency:
 env:
   PYTHON_VERSION: '3.12'
   PYINSTALLER_VERSION: '6.22.3'
+  # gyan essentials 构建的版本号：Windows 安装包里塞的 ffmpeg.exe/ffprobe.exe 就是它。
+  # 想升级 FFmpeg 只改这一行（GitHub 上的同名构建与 gyan.dev 的 release 版是同一份）。
+  FFMPEG_VERSION: '9.0.2'
 
 jobs:
   build:
@@ -89,33 +92,38 @@ jobs:
 
           # OpenRec.spec 第 31 行硬依赖 bin/ffmpeg.exe 与 bin/ffprobe.exe；
           # .gitignore 排除了 bin/*，所以只能在 CI 里现下载。
+          # 首选 GitHub 上 gyan 的同名构建（同一份 essentials，走 GitHub CDN，runner 上最稳）；
+          # gyan.dev 的 release 链接实测会先回 503 再把连接挂住，只作备份。
+          $ver = $env:FFMPEG_VERSION
           $sources = @(
+            "https://github.com/GyanD/codexffmpeg/releases/download/$ver/ffmpeg-$ver-essentials_build.zip",
             'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip',
             'https://github.com/BtbN/FFmpeg-Builds/releases/latest/download/ffmpeg-master-latest-win64-gpl.zip'
           )
           $zip = Join-Path $env:RUNNER_TEMP 'ffmpeg.zip'
           $downloaded = $false
+          $deadline = (Get-Date).AddMinutes(10)
           foreach ($url in $sources) {
             if ($downloaded) { break }
-            for ($attempt = 1; $attempt -le 3; $attempt++) {
-              Write-Host "下载 FFmpeg（第 $attempt/3 次）：$url"
+            for ($attempt = 1; $attempt -le 2; $attempt++) {
+              if ((Get-Date) -gt $deadline) { Write-Host 'FFmpeg 下载超过 10 分钟预算，放弃'; break }
+              Write-Host "下载 FFmpeg（第 $attempt/2 次）：$url"
               Remove-Item -Force -ErrorAction SilentlyContinue $zip
-              # speed-limit/speed-time：gyan.dev 偶尔「连接建起来了却不给数据」，没有这两个参数
-              # curl 会一直挂到 max-time（实测在 runner 上白等 15 分钟以上）；
-              # 速度低于 4 KB/s 持续 60 秒就自己断开，交给外层重试。
-              & curl.exe -L --fail --silent --show-error --connect-timeout 20 --max-time 300 --speed-limit 4096 --speed-time 60 --retry 2 --retry-delay 5 --retry-all-errors -o $zip $url
+              # 每次尝试限时 180 秒，外加「30 秒内低于 4 KB/s 就断开」：
+              # gyan.dev 曾先回 503 再把连接挂着不动，没有这两个参数 curl 会一直等下去。
+              & curl.exe -L --fail --silent --show-error --connect-timeout 15 --max-time 180 --speed-limit 4096 --speed-time 30 -o $zip $url
               $code = $LASTEXITCODE
               if ($code -eq 0 -and (Test-Path $zip) -and (Get-Item $zip).Length -gt 10MB) {
                 Write-Host ("下载完成：{0:N1} MB" -f ((Get-Item $zip).Length / 1MB))
                 $downloaded = $true
                 break
               }
-              Write-Host "下载失败（curl 退出码 $code），$([int](5 * $attempt)) 秒后重试"
-              Start-Sleep -Seconds ([int](5 * $attempt))
+              Write-Host "下载失败（curl 退出码 $code），5 秒后重试"
+              Start-Sleep -Seconds 5
             }
           }
           if (-not $downloaded) {
-            Write-Host '::error::FFmpeg 下载失败：gyan.dev 与 BtbN 两个源各重试 3 次都不行，请检查网络或换镜像源。'
+            Write-Host '::error::FFmpeg 下载失败：GitHub 上的 gyan 构建、gyan.dev、BtbN 三个源都拿不到，请检查网络或换镜像源。'
             exit 1
           }
 
