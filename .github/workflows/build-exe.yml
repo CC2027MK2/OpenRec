@@ -75,7 +75,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python -m pip install "pyinstaller==$env:PYINSTALLER_VERSION"
-          python -c "import PySide6, numpy, cv2, mss, soundcard, dxcam, qrcode; print('deps ok, PySide6', PySide6.__version__, 'numpy', numpy.__version__)"
+          # 只用 importlib.metadata 校验版本，不真的 import：runner 上 comtypes 在
+          # CoInitializeEx 时会报 "Cannot change thread mode after it is set"（dxcam 依赖它）。
+          python -c "from importlib.metadata import version; names=['PySide6','numpy','opencv-python-headless','mss','soundcard','dxcam','qrcode','pyinstaller']; print('\n'.join(f'{n}=={version(n)}' for n in names))"
 
       - name: 下载 FFmpeg 并放入 bin/
         shell: pwsh
@@ -131,9 +133,12 @@ jobs:
           Copy-Item -Force $ff.FullName (Join-Path $PWD 'bin\ffmpeg.exe')
           Copy-Item -Force $fp.FullName (Join-Path $PWD 'bin\ffprobe.exe')
           Get-ChildItem 'bin' | Select-Object Name, Length | Format-Table -AutoSize
-          & (Join-Path $PWD 'bin\ffmpeg.exe') -version | Select-Object -First 1
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host '::error::下载到的 ffmpeg.exe 无法运行'
+          # 先把输出整体收进变量再取首行，避免管道提前关闭让 ffmpeg 非零退出。
+          $ffOut = & (Join-Path $PWD 'bin\ffmpeg.exe') -version 2>&1
+          $ffCode = $LASTEXITCODE
+          Write-Host ($ffOut | Select-Object -First 1)
+          if ($ffCode -ne 0) {
+            Write-Host "::error::下载到的 ffmpeg.exe 无法运行（退出码 $ffCode）"
             exit 1
           }
 
