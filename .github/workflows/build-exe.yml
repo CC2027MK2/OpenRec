@@ -45,8 +45,9 @@ jobs:
             exit 1
           }
           $appVer = $m.Groups[1].Value
-          # 允许 v1.6.8 以及 v1.6.8-<预发布后缀>；v1.6.9 这类真实版本不一致仍然失败。
-          $pattern = '^' + [regex]::Escape($appVer) + '(-[0-9A-Za-z.]+)?$'
+          # 允许 v1.6.8 以及 v1.6.8-<预发布后缀>（后缀里可以再有连字符，如 v1.7.0-rc-1）；
+          # v1.6.9 这类真实版本不一致仍然失败。
+          $pattern = '^' + [regex]::Escape($appVer) + '(-[0-9A-Za-z.-]+)?$'
           if ($ver -notmatch $pattern) {
             Write-Host "::error::版本不一致：tag 为 $tag（去掉前缀 v 后是 $ver），但 openrec/config.py 里 APP_VERSION = '$appVer'。请先把源码版本号改成 $ver（改完提交到 main）再重新打 tag。"
             exit 1
