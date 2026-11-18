@@ -1,5 +1,10 @@
 # OpenRec · 本地录屏
 
+<p>
+  <a href="https://github.com/CC2027MK2/OpenRec/releases/latest"><img src="https://img.shields.io/github/v/release/CC2027MK2/OpenRec?label=Download&color=2ea44f" alt="Download the latest release"></a>
+  <a href="#许可"><img src="https://img.shields.io/github/license/CC2027MK2/OpenRec?label=license&color=blue" alt="License"></a>
+</p>
+
 <p><img src="docs/logo.png" width="96" alt="OpenRec logo"></p>
 
 参照 EV 录屏的**本地功能**做的干净室复刻：全屏/区域/窗口/仅音频录制、麦克风与系统声混音、摄像头叠加、白板标注、剪辑、录制库、损坏视频修复、局域网扫码观看。
