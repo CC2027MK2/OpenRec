@@ -46,9 +46,9 @@
 
 ## 运行
 
-本仓库只包含源码与构建脚本，不包含 `bin\`、`build\`、`dist\`、安装包与录像等生成物。
+本仓库只包含源码与构建脚本，不包含 `bin\`、`build\`、`dist\`、录像等生成物。现成的 Windows 安装包不在仓库里，而是在 [Releases](https://github.com/CC2027MK2/OpenRec/releases/latest) 的附件里（由 GitHub Actions 在 Windows 上构建）。
 
-**安装版（推荐）**：双击 `OpenRec_Setup_1.6.8.exe`，按向导完成安装，桌面与开始菜单会出现快捷方式。安装到当前用户目录，无需管理员权限；卸载通过「设置 → 应用」或开始菜单中的卸载项。
+**安装版（推荐）**：从 [Releases](https://github.com/CC2027MK2/OpenRec/releases/latest) 下载 `OpenRec_Setup_<版本>.exe`（约 131 MB，**已内置 FFmpeg**），双击按向导完成安装，桌面与开始菜单会出现快捷方式。安装到当前用户目录，无需管理员权限；卸载通过「设置 → 应用」或开始菜单中的卸载项。安装包未做代码签名，首次运行若弹 SmartScreen，点「更多信息 → 仍要运行」。
 
 安装版的配置保存在 `%LOCALAPPDATA%\OpenRec\data`，录像默认保存到「视频\OpenRec」，可在程序内修改。升级安装会保留设置。
 
@@ -69,7 +69,7 @@ run.bat
 dist\OpenRec\OpenRec.exe --selftest
 ```
 
-仓库不含 FFmpeg 二进制（单文件约 105 MB，超过 GitHub 的 100 MB 限制）。请自行下载 FFmpeg 9.0.2 essentials（含 libx264/aac/NVENC/QSV/AMF），把 `ffmpeg.exe`、`ffprobe.exe` 放入 `bin\` 目录（该目录已在 `.gitignore` 中忽略）。
+源码运行或自己打包时需要 FFmpeg：仓库本身不含二进制（`ffmpeg.exe` 单文件约 105 MB，超过 GitHub 的 100 MB 限制），**但 Release 里的安装包已内置** `ffmpeg.exe` / `ffprobe.exe`。自备请下载 FFmpeg 9.0.2 essentials（含 libx264/aac/NVENC/QSV/AMF），把 `ffmpeg.exe`、`ffprobe.exe` 放入 `bin\` 目录（该目录已在 `.gitignore` 中忽略）。
 
 打包为独立 exe：
 
