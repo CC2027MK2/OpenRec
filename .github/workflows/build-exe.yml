@@ -157,7 +157,16 @@ jobs:
             exit 1
           }
           Get-ChildItem 'dist/OpenRec' | Select-Object Name, Length | Format-Table -AutoSize
-          foreach ($p in @('dist/OpenRec/LICENSE', 'dist/OpenRec/LICENSES', 'dist/OpenRec/docs/OpenRec.ico')) {
+          # spec 把 bin/ffmpeg.exe、bin/ffprobe.exe 作为 binaries 打包；PyInstaller 6 放进 _internal\bin，
+          # 这里递归找一遍，确保录音/分享真的带上了 FFmpeg。
+          $ffBundled = Get-ChildItem -Path 'dist/OpenRec' -Recurse -Filter 'ffmpeg.exe' | Select-Object -First 1
+          $fpBundled = Get-ChildItem -Path 'dist/OpenRec' -Recurse -Filter 'ffprobe.exe' | Select-Object -First 1
+          if (-not $ffBundled -or -not $fpBundled) {
+            Write-Host '::error::dist/OpenRec 里没有打包进 ffmpeg.exe / ffprobe.exe'
+            exit 1
+          }
+          Write-Host "已打包 FFmpeg：$($ffBundled.FullName)"
+          foreach ($p in @('dist/OpenRec/LICENSE', 'dist/OpenRec/LICENSES')) {
             if (-not (Test-Path $p)) { Write-Host "::warning::dist 里缺少 $p（.iss 会照常打包其余文件）" }
           }
 
@@ -230,7 +239,10 @@ jobs:
           gh release view $tag --repo $repo 2>$null | Out-Null
           if ($LASTEXITCODE -ne 0) {
             Write-Host "Release $tag 不存在，创建它"
-            gh release create $tag --repo $repo --verify-tag --generate-notes --title "OpenRec $tag"
+            $createArgs = @('release', 'create', $tag, '--repo', $repo, '--verify-tag', '--generate-notes', '--title', "OpenRec $tag")
+            # 带后缀的 tag（如 v1.7.0-rc1）按预发布处理，不去抢 Latest。
+            if ($tag -match '-') { $createArgs += '--prerelease' }
+            gh @createArgs
             if ($LASTEXITCODE -ne 0) {
               Write-Host "::error::创建 Release $tag 失败（gh 退出码 $LASTEXITCODE）"
               exit 1
