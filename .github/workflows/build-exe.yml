@@ -1,12 +1,20 @@
 name: Build Windows Installer
 
 # 推 main 出构建产物（Actions artifact）；推 v* tag 额外把安装包挂到该 tag 的 Release。
+# paths-ignore 只对 branch push 生效，tag push 不受影响（打 tag 一定构建）。
 on:
   push:
     branches:
       - main
     tags:
       - 'v*'
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSES/**'
+      - 'tests/**'
+      - '.gitignore'
+      - 'LICENSE'
   workflow_dispatch:
 
 permissions:
