@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# 构建产物
+build/
+dist/
+OpenRec_安装包/
+
+# 运行时数据与录像（含本机设置、日志、截图缓存）
+data/
+recordings/
+*.log
+selftest.txt
+
+# 第三方二进制：单文件约 105 MB，超过 GitHub 限制，请自行下载到 bin\
+bin/*
+!bin/.gitkeep
+
+# 编辑器与系统文件
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

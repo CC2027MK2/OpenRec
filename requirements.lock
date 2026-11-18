@@ -1,0 +1,10 @@
+# 已验证的依赖版本锁定（2026-11-11，Python 3.13 / Windows 11）
+# 安装：pip install -r requirements.lock
+PySide6==6.12.0
+mss==10.2.0
+SoundCard==0.4.6
+qrcode==8.2
+numpy==2.5.4
+pillow==12.1.1
+opencv-python-headless==5.0.0.93
+dxcam==0.3.0

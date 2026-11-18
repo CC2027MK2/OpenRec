@@ -1,0 +1,37 @@
+FFmpeg 第三方组件说明
+
+一、随包二进制（未修改）
+  bin\ffmpeg.exe
+  bin\ffprobe.exe
+构建信息：ffmpeg version 9.0.2-essentials_build-www.gyan.dev
+（gyan.dev 的 Windows 静态构建，https://www.gyan.dev/ffmpeg/builds/）
+
+二、许可
+  GNU General Public License v3（GPL-3.0）
+  许可全文见同目录 GPL-3.0.txt，亦可见 https://www.gnu.org/licenses/gpl-3.0.txt
+
+三、版权
+  FFmpeg 由 FFmpeg 项目及其贡献者开发，版权归各自作者所有。
+  项目主页：https://ffmpeg.org/
+  版权与许可说明：https://ffmpeg.org/legal.html
+
+四、无担保声明
+  本软件按“现状”提供，不附带任何明示或默示担保，包括但不限于适销性、
+  特定用途适用性及不侵权的担保。使用本软件的风险由使用者自行承担。
+  详情见 GPL-3.0.txt 第 15、16 节。
+
+五、对应源码获取（GPLv3 §6）
+  本程序未修改 FFmpeg 二进制，仅通过外部进程调用。
+  对应源码可从以下地址获取：
+    https://ffmpeg.org/download.html
+    https://www.gyan.dev/ffmpeg/builds/
+  如需要与本程序随包构建完全一致的源码打包，可联系作者 C.C. 获取；
+  该书面要约自本版本发布之日起三年内有效。
+
+六、关系说明
+  FFmpeg 与本程序属于 GPLv3 §5 所述的“聚合”（mere aggregation），
+  MIT 许可的 OpenRec 主程序不因随包分发 FFmpeg 而受 GPL 约束。
+
+OpenRec 作者：C.C.
+版本：1.6.8
+日期：2026-11-18
